@@ -31,7 +31,10 @@ def work(url):
             old_soup = BeautifulSoup(old_page.content, "html.parser")
             
             old_number_of_seats_text = old_soup.find("a", { "href" : url }).findChildren("div")[4].text
-            old_number_of_seats = int(old_number_of_seats_text.split()[0])
+            if old_number_of_seats_text == "нет мест":
+                old_number_of_seats = 0
+            else:
+                old_number_of_seats = int(old_number_of_seats_text.split()[0])
 
             time.sleep(interval)
 
@@ -40,7 +43,10 @@ def work(url):
             new_soup = BeautifulSoup(new_page.content, "html.parser")
             
             new_number_of_seats_text = new_soup.find("a", { "href" : url }).findChildren("div")[4].text
-            new_number_of_seats = int(new_number_of_seats_text.split()[0])
+            if new_number_of_seats_text == "нет мест":
+                new_number_of_seats = 0
+            else:
+                new_number_of_seats = int(new_number_of_seats_text.split()[0])
 
             if new_number_of_seats > old_number_of_seats:
                 print("Новые билеты по " + url)
