@@ -23,37 +23,28 @@ def work(url):
     """ Requesting JSON data (free seats) """
     print("Запускаем мониторинг: " + url) 
 
-    # Fetching the data in order to get two states (old and new)
+    current_number_of_seats = 0
+
     while True:
         try:
-            # Parsing the first (old) data
-            old_page = requests.get(url)
-            old_soup = BeautifulSoup(old_page.content, "html.parser")
+            page = requests.get(url)
+            soup = BeautifulSoup(page.content, "html.parser")
             
-            old_number_of_seats_text = old_soup.find("a", { "href" : url }).findChildren("div")[4].text
-            if old_number_of_seats_text == "нет мест":
-                old_number_of_seats = 0
+            number_of_seats_text = soup.find("a", { "href" : url }).findChildren("div")[4].text
+            if number_of_seats_text == "нет мест":
+                number_of_seats = 0
             else:
-                old_number_of_seats = int(old_number_of_seats_text.split()[0])
-
-            time.sleep(interval)
-
-            # Parsing the second (new) data
-            new_page = requests.get(url)
-            new_soup = BeautifulSoup(new_page.content, "html.parser")
+                number_of_seats = int(number_of_seats_text.split()[0])
             
-            new_number_of_seats_text = new_soup.find("a", { "href" : url }).findChildren("div")[4].text
-            if new_number_of_seats_text == "нет мест":
-                new_number_of_seats = 0
-            else:
-                new_number_of_seats = int(new_number_of_seats_text.split()[0])
-
-            if new_number_of_seats > old_number_of_seats:
+            if number_of_seats > current_number_of_seats:
+                current_number_of_seats = number_of_seats
                 print("Новые билеты по " + url)
 
                 for i in range(3):
                     playsound("success.mp3")
-                    time.sleep(1) 
+                    time.sleep(1)
+
+            time.sleep(interval)
         except Exception:
             print("\n\n!!!ВОЗНИКЛА НЕИЗВЕСТНАЯ ОШИБКА!!!")
 
